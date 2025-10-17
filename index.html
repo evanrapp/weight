@@ -14,10 +14,10 @@
         const queryString = encodeURIComponent('SELECT A, B');
 
         const query = new google.visualization.Query(
-          'https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/edit?sheet=Sheet1&tq=' + queryString
+          'https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/gviz/tq?sheet=Sheet1&tq=' + queryString
         );
 
-        alert (https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/edit?sheet=Sheet1&tq=' + queryString);
+        <!-- alert (https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/edit?sheet=Sheet1&tq=' + queryString); -->
         query.send(handleQueryResponse);
       }
 
@@ -50,6 +50,7 @@
         <p>Another test of the grapher</p>
   </body>
 </html>
+
 
 
 
