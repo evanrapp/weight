@@ -1,0 +1,25 @@
+/* styles.css */
+
+.weight_links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* optional spacing between links */
+  align-items: flex-start; /* aligns links to the left */
+  padding: 10px;
+}
+
+/* Optional styling for the links themselves */
+.weight_links a {
+  font-size: 16px;
+  color: #2a7ae2;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px 10px;
+  border: 1px solid #2a7ae2;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.weight_links a:hover {
+  background-color: #e2f0ff;
+}
