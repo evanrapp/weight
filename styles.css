@@ -1,11 +1,14 @@
 /* styles.css */
 
-h1 {
+/*h1 {
   font-family: 'Helvetica', 'Arial', sans-serif;
-}
+}*/
 
 body {
+  margin: 0;
+  font-family: 'Helvetica', 'Arial', sans-serif;
   display: flex;
+  height: 100vh;
 }
 
 .weight_links {
