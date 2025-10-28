@@ -35,9 +35,7 @@
           hAxis: { title: 'Time' },
           vAxis: { title: 'Weight' },
           legend: 'none',
-          curveType: 'function',
-          animation.duration: 300,
-          animation.startup: true
+          curveType: 'function'
         };
 
         const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
@@ -51,10 +49,10 @@
     <p>New weight measurements can be recorded with the "Input New Weight" link to the left.</p>
 
     <div id="chart_div" style="width: 900px; height: 500px;"></div>
-
-    test
+    
   </body>
 </html>
+
 
 
 
