@@ -35,7 +35,10 @@
           hAxis: { title: 'Time' },
           vAxis: { title: 'Weight' },
           legend: 'none',
-          curveType: 'function'
+          curveType: 'function',
+          animation.duration: 300,
+          animation.startup: true,
+          chartArea.left: 1
         };
 
         const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
@@ -52,6 +55,7 @@
 
   </body>
 </html>
+
 
 
 
