@@ -37,11 +37,11 @@
         };
 
       try {
-      const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-      } catch (e) {
-        console.error('Chart rendering failed:', e);
-      }
+        const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+        } catch (e) {
+          console.error('Chart rendering failed:', e);
+        }
       }
     </script>
     <style>
@@ -50,12 +50,11 @@
     <h2>Weight Chart</h2>
     <p>This is a weight recording and graphing application.</p> 
     <p>New weight measurements can be recorded with the "Input New Weight" link to the left.</p>
-
-    <!-- <div id="chart_div" style="width: 900px; height: 500px;"><p>Loading chart...</p> -->
     <div id="chart_div" style="width: 900px; height: 500px; margin-left: 0; padding-left: 0;"><p>Loading chart...</p></div>
     
   </body>
 </html>
+
 
 
 
