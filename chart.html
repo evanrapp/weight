@@ -14,7 +14,7 @@
       function drawChart() {
         const queryString = encodeURIComponent('SELECT A, B');
         const query = new google.visualization.Query(
-          'https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/gviz/tq?sheet=Sheet1&tq=' + queryString,options
+          'https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/gviz/tq?sheet=Sheet1&tq=' + queryString
         );
         query.send(handleQueryResponse);
       }
@@ -54,6 +54,7 @@
     testing again
   </body>
 </html>
+
 
 
 
