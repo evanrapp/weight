@@ -13,9 +13,17 @@
 
       function drawChart() {
         const queryString = encodeURIComponent('SELECT A, B');
+        const options = {
+          chartArea: {
+            left: 10,       // Tighten left margin (try 10–50)
+            width: '90%',   // Expand chart width to fill space
+            top: 40,
+            height: '75%'
+          }
+        }
 
         const query = new google.visualization.Query(
-          'https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/gviz/tq?sheet=Sheet1&tq=' + queryString
+          'https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/gviz/tq?sheet=Sheet1&tq=' + queryString,options
         );
         query.send(handleQueryResponse);
       }
@@ -53,6 +61,7 @@
     
   </body>
 </html>
+
 
 
 
