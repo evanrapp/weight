@@ -13,15 +13,6 @@
 
       function drawChart() {
         const queryString = encodeURIComponent('SELECT A, B');
-        const options = {
-          chartArea: {
-            left: 10,       // Tighten left margin (try 10–50)
-            width: '90%',   // Expand chart width to fill space
-            top: 40,
-            height: '75%'
-          }
-        }
-
         const query = new google.visualization.Query(
           'https://docs.google.com/spreadsheets/d/1SjoM1R8vgk_TRxRiBg_wnJqYKCnlEE30-3cfrcEilzQ/gviz/tq?sheet=Sheet1&tq=' + queryString,options
         );
@@ -41,6 +32,7 @@
           hAxis: { title: 'Time' },
           vAxis: { title: 'Weight' },
           legend: 'none',
+          chartArea: {left: 10},
           curveType: 'function'
         };
 
@@ -59,9 +51,10 @@
     <p>New weight measurements can be recorded with the "Input New Weight" link to the left.</p>
     <div id="chart_div" style="width: 900px; height: 500px; margin-left: 0; padding-left: 0;"><p>Loading chart...</p></div>
 
-    testing
+    testing again
   </body>
 </html>
+
 
 
 
