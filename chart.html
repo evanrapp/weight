@@ -2,13 +2,11 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Weight Chart</title> 
+    <title>Weight Chart</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      // Load the Visualization API and the corechart package.
-      google.charts.load('current', { packages: ['corechart'] });
 
-      // Set a callback to run when the Google Visualization API is loaded.
+    <script type="text/javascript">
+      google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
@@ -27,32 +25,94 @@
 
         const data = response.getDataTable();
 
+        // ------------------------------------------------------------
+        // 1. CREATE 7-DAY MOVING AVERAGE
+        // ------------------------------------------------------------
+        const movingAvgData = new google.visualization.DataTable();
+        movingAvgData.addColumn('date', 'Date');
+        movingAvgData.addColumn('number', 'Weight');
+        movingAvgData.addColumn('number', '7-Day Avg');
+
+        const rows = data.getNumberOfRows();
+        let weights = [];
+
+        for (let i = 0; i < rows; i++) {
+          const date = data.getValue(i, 0);
+          const weight = data.getValue(i, 1);
+          weights.push(weight);
+
+          // compute 7-day average
+          const start = Math.max(0, i - 6);
+          const slice = weights.slice(start, i + 1);
+          const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
+
+          movingAvgData.addRow([date, weight, avg]);
+        }
+
         const options = {
-          title: 'Weight Chart',
+          title: 'Weight Chart (with 7-Day Trend Line)',
           hAxis: { title: 'Time' },
           vAxis: { title: 'Weight' },
-          legend: 'none',
-          /* chartArea: {left: 20}, */
-          curveType: 'function'
+          legend: { position: 'bottom' },
+          curveType: 'function',
+          series: {
+            0: { color: '#3366cc' }, // actual weight
+            1: { color: '#dc3912', lineWidth: 3 } // moving average
+          }
         };
 
-      try {
         const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-        } catch (e) {
-          console.error('Chart rendering failed:', e);
+        chart.draw(movingAvgData, options);
+
+        // ------------------------------------------------------------
+        // 2. WEEKLY WEIGHT CHANGE CHART
+        // ------------------------------------------------------------
+        const weeklyData = new google.visualization.DataTable();
+        weeklyData.addColumn('string', 'Week');
+        weeklyData.addColumn('number', 'Avg Weekly Change');
+
+        let weekStartIndex = 0;
+
+        while (weekStartIndex < rows) {
+          const endIndex = Math.min(weekStartIndex + 7, rows - 1);
+
+          const startWeight = data.getValue(weekStartIndex, 1);
+          const endWeight = data.getValue(endIndex, 1);
+          const change = endWeight - startWeight;
+
+          const weekLabel = `Week ${Math.floor(weekStartIndex / 7) + 1}`;
+          weeklyData.addRow([weekLabel, change]);
+
+          weekStartIndex += 7;
         }
+
+        const weeklyOptions = {
+          title: 'Average Weekly Weight Change',
+          hAxis: { title: 'Week' },
+          vAxis: { title: 'Weight Change (lbs)' },
+          legend: 'none',
+          colors: ['#109618']
+        };
+
+        const weeklyChart = new google.visualization.ColumnChart(document.getElementById('weekly_chart_div'));
+        weeklyChart.draw(weeklyData, weeklyOptions);
       }
     </script>
   </head>
+
   <body>
     <h2>Weight Chart</h2>
-    <p>This is a weight recording and graphing application.</p> 
+    <p>This is a weight recording and graphing application.</p>
     <p>New weight measurements can be recorded with the "Input New Weight" link to the left.</p>
-    <div id="chart_div" style="width: 900px; height: 500px; margin-left: 0; padding-left: 0;"><p>Loading chart...</p></div>
+
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+
+    <h2>Weekly Weight Change</h2>
+    <div id="weekly_chart_div" style="width: 900px; height: 400px;"></div>
 
   </body>
 </html>
+
 
 
 
