@@ -26,12 +26,12 @@
         const data = response.getDataTable();
 
         // ------------------------------------------------------------
-        // 1. CREATE 7-DAY MOVING AVERAGE
+        // 1. CREATE 30-DAY MOVING AVERAGE
         // ------------------------------------------------------------
         const movingAvgData = new google.visualization.DataTable();
         movingAvgData.addColumn('date', 'Date');
         movingAvgData.addColumn('number', 'Weight');
-        movingAvgData.addColumn('number', '7-Day Avg');
+        movingAvgData.addColumn('number', '30-Day Avg');
 
         const rows = data.getNumberOfRows();
         let weights = [];
@@ -42,7 +42,7 @@
           weights.push(weight);
 
           // compute 7-day average
-          const start = Math.max(0, i - 6);
+          const start = Math.max(0, i - 30);
           const slice = weights.slice(start, i + 1);
           const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
 
@@ -50,7 +50,7 @@
         }
 
         const options = {
-          title: 'Weight Chart (with 7-Day Trend Line)',
+          title: 'Weight Chart (with 30-Day Trend Line)',
           hAxis: { title: 'Time' },
           vAxis: { title: 'Weight' },
           legend: { position: 'bottom' },
@@ -112,6 +112,7 @@
 
   </body>
 </html>
+
 
 
 
