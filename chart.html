@@ -24,6 +24,25 @@
         }
 
         const data = response.getDataTable();
+        const rows = data.getNumberOfRows();
+
+        // ------------------------------------------------------------
+        // NEW: TOTAL DAYS + TOTAL WEIGHT CHANGE
+        // ------------------------------------------------------------
+        if (rows > 1) {
+          const firstDate = data.getValue(0, 0);
+          const lastDate = data.getValue(rows - 1, 0);
+
+          const firstWeight = data.getValue(0, 1);
+          const lastWeight = data.getValue(rows - 1, 1);
+
+          const totalDays = Math.round((lastDate - firstDate) / (1000 * 60 * 60 * 24));
+          const weightDiff = (lastWeight - firstWeight).toFixed(1);
+
+          document.getElementById("stats_display").innerHTML =
+            `<strong>Total Days Tracked:</strong> ${totalDays}<br>
+             <strong>Total Weight Change:</strong> ${weightDiff} lbs`;
+        }
 
         // ------------------------------------------------------------
         // 1. CREATE 30-DAY MOVING AVERAGE
@@ -33,7 +52,6 @@
         movingAvgData.addColumn('number', 'Weight');
         movingAvgData.addColumn('number', '30-Day Avg');
 
-        const rows = data.getNumberOfRows();
         let weights = [];
 
         for (let i = 0; i < rows; i++) {
@@ -41,7 +59,6 @@
           const weight = data.getValue(i, 1);
           weights.push(weight);
 
-          // compute 7-day average
           const start = Math.max(0, i - 30);
           const slice = weights.slice(start, i + 1);
           const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
@@ -56,8 +73,8 @@
           legend: { position: 'bottom' },
           curveType: 'function',
           series: {
-            0: { color: '#3366cc' }, // actual weight
-            1: { color: '#dc3912', lineWidth: 3 } // moving average
+            0: { color: '#3366cc' },
+            1: { color: '#dc3912', lineWidth: 3 }
           }
         };
 
@@ -107,11 +124,18 @@
 
     <div id="chart_div" style="width: 900px; height: 500px;"></div>
 
+    <!-- NEW STATS PANEL -->
+    <div id="stats_display"
+         style="margin: 20px 0; padding: 15px; background: #eef2f5; width: 350px; border-radius: 8px; font-size: 16px;">
+      Loading statistics…
+    </div>
+
     <h2>Weekly Weight Change</h2>
     <div id="weekly_chart_div" style="width: 900px; height: 400px;"></div>
 
   </body>
 </html>
+
 
 
 
