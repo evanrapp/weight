@@ -9,6 +9,11 @@
       google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawChart);
 
+      let fullData = null;       // full dataset
+      let movingAvgData = null;  // full moving-average dataset
+      let chart = null;          // chart instance
+      let options = null;        // chart options
+
       function drawChart() {
         const queryString = encodeURIComponent('SELECT A, B');
         const query = new google.visualization.Query(
@@ -23,18 +28,18 @@
           return;
         }
 
-        const data = response.getDataTable();
-        const rows = data.getNumberOfRows();
+        fullData = response.getDataTable();
+        const rows = fullData.getNumberOfRows();
 
         // ------------------------------------------------------------
-        // NEW: TOTAL DAYS + TOTAL WEIGHT CHANGE
+        // TOTAL DAYS + TOTAL WEIGHT CHANGE
         // ------------------------------------------------------------
         if (rows > 1) {
-          const firstDate = data.getValue(0, 0);
-          const lastDate = data.getValue(rows - 1, 0);
+          const firstDate = fullData.getValue(0, 0);
+          const lastDate = fullData.getValue(rows - 1, 0);
 
-          const firstWeight = data.getValue(0, 1);
-          const lastWeight = data.getValue(rows - 1, 1);
+          const firstWeight = fullData.getValue(0, 1);
+          const lastWeight = fullData.getValue(rows - 1, 1);
 
           const totalDays = Math.round((lastDate - firstDate) / (1000 * 60 * 60 * 24));
           const weightDiff = (lastWeight - firstWeight).toFixed(1);
@@ -45,9 +50,9 @@
         }
 
         // ------------------------------------------------------------
-        // 1. CREATE 30-DAY MOVING AVERAGE
+        // BUILD MOVING AVERAGE DATASET
         // ------------------------------------------------------------
-        const movingAvgData = new google.visualization.DataTable();
+        movingAvgData = new google.visualization.DataTable();
         movingAvgData.addColumn('date', 'Date');
         movingAvgData.addColumn('number', 'Weight');
         movingAvgData.addColumn('number', '30-Day Avg');
@@ -55,8 +60,8 @@
         let weights = [];
 
         for (let i = 0; i < rows; i++) {
-          const date = data.getValue(i, 0);
-          const weight = data.getValue(i, 1);
+          const date = fullData.getValue(i, 0);
+          const weight = fullData.getValue(i, 1);
           weights.push(weight);
 
           const start = Math.max(0, i - 30);
@@ -66,7 +71,10 @@
           movingAvgData.addRow([date, weight, avg]);
         }
 
-        const options = {
+        // ------------------------------------------------------------
+        // CHART OPTIONS
+        // ------------------------------------------------------------
+        options = {
           title: 'Weight Chart (with 30-Day Trend Line)',
           hAxis: { title: 'Time' },
           vAxis: { title: 'Weight' },
@@ -78,11 +86,13 @@
           }
         };
 
-        const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-        chart.draw(movingAvgData, options);
+        chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+        // DEFAULT VIEW = MOST RECENT YEAR
+        applyRange(365);
 
         // ------------------------------------------------------------
-        // 2. WEEKLY WEIGHT CHANGE CHART
+        // WEEKLY WEIGHT CHANGE CHART
         // ------------------------------------------------------------
         const weeklyData = new google.visualization.DataTable();
         weeklyData.addColumn('string', 'Week');
@@ -93,8 +103,8 @@
         while (weekStartIndex < rows) {
           const endIndex = Math.min(weekStartIndex + 7, rows - 1);
 
-          const startWeight = data.getValue(weekStartIndex, 1);
-          const endWeight = data.getValue(endIndex, 1);
+          const startWeight = fullData.getValue(weekStartIndex, 1);
+          const endWeight = fullData.getValue(endIndex, 1);
           const change = endWeight - startWeight;
 
           const weekLabel = `Week ${Math.floor(weekStartIndex / 7) + 1}`;
@@ -114,6 +124,29 @@
         const weeklyChart = new google.visualization.ColumnChart(document.getElementById('weekly_chart_div'));
         weeklyChart.draw(weeklyData, weeklyOptions);
       }
+
+      // ------------------------------------------------------------
+      // TIME RANGE FILTERING FUNCTION
+      // ------------------------------------------------------------
+      function applyRange(days) {
+        const rows = movingAvgData.getNumberOfRows();
+        const lastDate = movingAvgData.getValue(rows - 1, 0);
+
+        const cutoff = new Date(lastDate.getTime() - days * 24 * 60 * 60 * 1000);
+
+        const view = new google.visualization.DataView(movingAvgData);
+        let startIndex = 0;
+
+        for (let i = 0; i < rows; i++) {
+          if (movingAvgData.getValue(i, 0) >= cutoff) {
+            startIndex = i;
+            break;
+          }
+        }
+
+        view.setRows(startIndex, rows);
+        chart.draw(view, options);
+      }
     </script>
   </head>
 
@@ -122,9 +155,19 @@
     <p>This is a weight recording and graphing application.</p>
     <p>New weight measurements can be recorded with the "Input New Weight" link to the left.</p>
 
+    <!-- TIME RANGE BUTTONS -->
+    <div style="margin-bottom: 15px;">
+      <button onclick="applyRange(1)">1 Day</button>
+      <button onclick="applyRange(30)">1 Month</button>
+      <button onclick="applyRange(90)">3 Months</button>
+      <button onclick="applyRange(180)">6 Months</button>
+      <button onclick="applyRange(365)">1 Year</button>
+      <button onclick="applyRange(730)">2 Years</button>
+      <button onclick="applyRange(50000)">All</button>
+    </div>
+
     <div id="chart_div" style="width: 900px; height: 500px;"></div>
 
-    <!-- NEW STATS PANEL -->
     <div id="stats_display"
          style="margin: 20px 0; padding: 15px; background: #eef2f5; width: 350px; border-radius: 8px; font-size: 16px;">
       Loading statistics…
