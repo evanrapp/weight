@@ -26,24 +26,53 @@
         const data = response.getDataTable();
         const rows = data.getNumberOfRows();
 
-        // ------------------------------------------------------------
-        // NEW: TOTAL DAYS + TOTAL WEIGHT CHANGE
-        // ------------------------------------------------------------
-        if (rows > 1) {
-          const firstDate = data.getValue(0, 0);
-          const lastDate = data.getValue(rows - 1, 0);
+// ------------------------------------------------------------
+// NEW: TOTAL DAYS + LAST CHANGE + TOTAL WEIGHT CHANGE
+// ------------------------------------------------------------
+if (rows > 1) {
+  const firstDate = data.getValue(0, 0);
+  const lastDate = data.getValue(rows - 1, 0);
 
-          const firstWeight = data.getValue(0, 1);
-          const lastWeight = data.getValue(rows - 1, 1);
+  const firstWeight = data.getValue(0, 1);
+  const lastWeight = data.getValue(rows - 1, 1);
 
-          const totalDays = Math.round((lastDate - firstDate) / (1000 * 60 * 60 * 24));
-          const weightDiff = (lastWeight - firstWeight).toFixed(1);
+  const totalDays = Math.round((lastDate - firstDate) / (1000 * 60 * 60 * 24));
+  const weightDiff = (lastWeight - firstWeight).toFixed(1);
 
-          document.getElementById("stats_display").innerHTML =
-            `<strong>Total Days Tracked:</strong> ${totalDays}<br>
-             <strong>Total Weight Change:</strong> ${weightDiff} lbs`;
-        }
+// ---- NEW: Last Change (difference between last two measurements) ----
+const prevDate = data.getValue(rows - 2, 0);
+const prevWeight = data.getValue(rows - 2, 1);
 
+const lastChange = (lastWeight - prevWeight).toFixed(1);
+
+// Time difference
+const msDiff = lastDate - prevDate;
+const minutes = Math.floor(msDiff / (1000 * 60));
+const hours = Math.floor(minutes / 60);
+const days = Math.floor(hours / 24);
+
+const remHours = hours % 24;
+const remMinutes = minutes % 60;
+
+// Smart pluralization + hide zero values
+function fmt(value, label) {
+  if (value === 0) return "";
+  return `${value} ${label}${value === 1 ? "" : "s"}`;
+}
+
+const parts = [
+  fmt(days, "day"),
+  fmt(remHours, "hour"),
+  fmt(remMinutes, "minute")
+].filter(Boolean);
+
+const timeDiffString = parts.join(", ");
+
+document.getElementById("stats_display").innerHTML =
+  `<strong>Total Days Tracked:</strong> ${totalDays}<br>
+   <strong>Last Change:</strong> ${lastChange} lbs (${timeDiffString})<br>
+   <strong>Total Weight Change:</strong> ${weightDiff} lbs`;
+}
         // ------------------------------------------------------------
         // 1. CREATE 30-DAY MOVING AVERAGE
         // ------------------------------------------------------------
